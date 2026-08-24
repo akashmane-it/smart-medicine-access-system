@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Medicine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Search for a Medicine</h1>
+
+        <form method="GET" action="/search" id="searchForm">
+            <input type="text" name="query" placeholder="Enter medicine name" value="{{ query|default('') }}" required style="max-width: 320px; display: inline-block;">
+            <input type="hidden" name="lat" id="lat" value="{{ lat|default('') }}">
+            <input type="hidden" name="lng" id="lng" value="{{ lng|default('') }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <p class="status-box" id="locationStatus">📍 Getting your location...</p>
+
+        <script>
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('lat').value = position.coords.latitude;
+                        document.getElementById('lng').value = position.coords.longitude;
+                        document.getElementById('locationStatus').innerText = "📍 Location found — results will be sorted by distance.";
+                    },
+                    function(error) {
+                        document.getElementById('locationStatus').innerText = "⚠️ Location not available. Enable location access for distance-sorted results.";
+                    }
+                );
+            } else {
+                document.getElementById('locationStatus').innerText = "⚠️ Your browser doesn't support location.";
+            }
+        </script>
+
+        {% if query %}
+            <h2>Results for "{{ query }}"</h2>
+
+            {% if results %}
+            <p>✅ Found at {{ results|length }} pharmacy/pharmacies:</p>
+            <table>
+                <tr>
+                    <th>Pharmacy</th>
+                    <th>Address</th>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Contact</th>
+                    {% if lat %}<th>Distance</th>{% endif %}
+                </tr>
+                {% for item in results %}
+                <tr>
+                    <td>{{ item['pharmacy_name'] }}</td>
+                    <td>{{ item['address'] }}</td>
+                    <td>{{ item['medicine_name'] }}</td>
+                    <td>{{ item['quantity'] }}</td>
+                    <td>₹{{ item['price'] }}</td>
+                    <td>{{ item['contact'] }}</td>
+                    {% if lat %}
+                    <td>
+                        {% if item['distance'] is not none %}
+                            {{ item['distance'] }} km
+                            <br><a href="https://www.google.com/maps/dir/?api=1&destination={{ item['latitude'] }},{{ item['longitude'] }}" target="_blank">Get Directions</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+            {% elif medicine_exists %}
+                <p class="error">⚠️ "{{ query }}" is known but currently out of stock at all registered pharmacies.</p>
+                <form method="POST" action="/request-medicine">
+                    <input type="hidden" name="medicine_name" value="{{ query }}">
+                    <button type="submit">Notify me when available</button>
+                </form>
+            {% else %}
+                <p class="error">❌ No medicine matching "{{ query }}" was found in our system.</p>
+                <form method="POST" action="/request-medicine">
+                    <input type="hidden" name="medicine_name" value="{{ query }}">
+                    <button type="submit">Request this medicine</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

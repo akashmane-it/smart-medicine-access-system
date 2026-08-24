@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Medicine Access System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div>
+            <a href="/register">User Register</a>
+            <a href="/login">User Login</a>
+            <a href="/pharmacy/register">Pharmacy Register</a>
+            <a href="/pharmacy/login">Pharmacy Login</a>
+            <a href="/admin/login">Admin</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Find Medicines. Instantly.</h1>
+        <p>Search nearby registered pharmacies for real-time medicine availability — by name, location, or by simply uploading your prescription.</p>
+    </div>
+
+    <div class="container">
+        <h2>What you can do</h2>
+        <div class="feature-grid">
+            <div class="feature-card blue">
+                <div class="icon-badge">🔍</div>
+                <h3>Search Medicines</h3>
+                <p>Find any medicine across all registered pharmacies instantly.</p>
+            </div>
+            <div class="feature-card teal">
+                <div class="icon-badge">📍</div>
+                <h3>Nearest First</h3>
+                <p>Results sorted by real distance from your current location.</p>
+            </div>
+            <div class="feature-card purple">
+                <div class="icon-badge">📄</div>
+                <h3>Scan Prescription</h3>
+                <p>Upload a photo and we'll auto-detect the medicines for you.</p>
+            </div>
+            <div class="feature-card orange">
+                <div class="icon-badge">🔔</div>
+                <h3>Request Alerts</h3>
+                <p>Out of stock? Request it and get notified when available.</p>
+            </div>
+        </div>
+
+        <h2>Get Started</h2>
+        <div class="role-grid">
+            <div class="role-card user-role">
+                <div class="role-icon">🧑‍⚕️</div>
+                <h3>I'm a Patient</h3>
+                <p>Search medicines, scan prescriptions, and find nearby pharmacies.</p>
+                <div class="role-links">
+                    <a href="/register">Register</a>
+                    <a href="/login">Login</a>
+                </div>
+            </div>
+            <div class="role-card pharmacy-role">
+                <div class="role-icon">🏥</div>
+                <h3>I'm a Pharmacy</h3>
+                <p>List your inventory and connect with patients who need it.</p>
+                <div class="role-links">
+                    <a href="/pharmacy/register">Register</a>
+                    <a href="/pharmacy/login">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

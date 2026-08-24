@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - MedFinder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/logout">Logout</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Welcome, {{ user_name }} 👋</h1>
+        <p>Search for medicines or scan a prescription to get started.</p>
+
+        <div class="action-links">
+            <a href="/search" class="link-blue">🔍 Search for Medicines</a>
+            <a href="/upload-prescription" class="link-purple">📄 Upload Prescription</a>
+        </div>
+    </div>
+</body>
+</html>

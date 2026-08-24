@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Prescription</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Upload Prescription</h1>
+        <p>Upload a clear photo of your prescription — we'll extract medicine names automatically.</p>
+
+        <form method="POST" action="/upload-prescription" enctype="multipart/form-data">
+            <label>Select prescription image (JPG/PNG)</label>
+            <input type="file" name="prescription" accept="image/*" required>
+            <button type="submit">Upload & Scan</button>
+        </form>
+
+        {% if extracted_text %}
+            <h2>Extracted Text</h2>
+            <pre class="status-box" style="white-space: pre-wrap; font-family: monospace;">{{ extracted_text }}</pre>
+
+            <h2>Matched Medicines</h2>
+            {% if matched_medicines %}
+                <div class="action-links">
+                {% for med in matched_medicines %}
+                    <a href="/search?query={{ med }}">🔍 {{ med }}</a>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p class="error">No known medicines were matched from the text. Try searching manually.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

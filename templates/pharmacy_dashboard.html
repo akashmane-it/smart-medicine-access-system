@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmacy Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar pharmacy">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/pharmacy/logout">Logout</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Welcome, {{ pharmacy_name }} 🏥</h1>
+        <p>Manage your medicine stock and view incoming requests.</p>
+
+        <div class="action-links">
+            <a href="/pharmacy/add-medicine" class="link-teal">➕ Add / Update Medicine Stock</a>
+            <a href="/pharmacy/requests" class="link-teal">📋 View Medicine Requests</a>
+        </div>
+
+        <h2>Your Medicine Stock</h2>
+        <table>
+            <tr>
+                <th>Medicine Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Last Updated</th>
+            </tr>
+            {% for item in inventory %}
+            <tr>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['quantity'] }}</td>
+                <td>₹{{ item['price'] }}</td>
+                <td>{{ item['updated_at'] }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No medicines added yet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Medicine Stock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar pharmacy">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/pharmacy/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container" style="max-width: 560px;">
+        <h1>Add / Update Medicine Stock</h1>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="/pharmacy/add-medicine">
+            <label>Medicine Name</label>
+            <input type="text" name="medicine_name" required>
+
+            <label>Generic Name (optional)</label>
+            <input type="text" name="generic_name">
+
+            <label>Category (optional, e.g. Painkiller)</label>
+            <input type="text" name="category">
+
+            <label>Quantity</label>
+            <input type="number" name="quantity" min="0" required>
+
+            <label>Price (₹)</label>
+            <input type="number" name="price" step="0.01" min="0" required>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</body>
+</html>
