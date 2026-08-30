@@ -216,15 +216,20 @@ def search():
         return redirect(url_for('login'))
 
     query = request.args.get('query', '').strip()
+    category = request.args.get('category', '').strip()
     lat = request.args.get('lat', '').strip()
     lng = request.args.get('lng', '').strip()
     results = []
     medicine_exists = True
     alternatives = []
 
-    if query:
-        conn = get_db_connection()
-        rows = conn.execute('''
+    conn = get_db_connection()
+    all_categories = conn.execute(
+        'SELECT DISTINCT category FROM medicines WHERE category IS NOT NULL AND category != "" ORDER BY category'
+    ).fetchall()
+
+    if query or category:
+        sql = '''
             SELECT pharmacies.id AS pharmacy_id,
                    pharmacies.name AS pharmacy_name,
                    pharmacies.address,
@@ -233,15 +238,25 @@ def search():
                    pharmacies.longitude,
                    medicines.id AS medicine_id,
                    medicines.name AS medicine_name,
+                   medicines.category,
                    inventory.quantity,
                    inventory.price
             FROM inventory
             JOIN pharmacies ON inventory.pharmacy_id = pharmacies.id
             JOIN medicines ON inventory.medicine_id = medicines.id
-            WHERE LOWER(medicines.name) LIKE LOWER(?)
-              AND inventory.quantity > 0
-        ''', ('%' + query + '%',)).fetchall()
+            WHERE inventory.quantity > 0
+        '''
+        params = []
 
+        if query:
+            sql += ' AND LOWER(medicines.name) LIKE LOWER(?)'
+            params.append('%' + query + '%')
+
+        if category:
+            sql += ' AND LOWER(medicines.category) = LOWER(?)'
+            params.append(category)
+
+        rows = conn.execute(sql, params).fetchall()
         results = [dict(row) for row in rows]
 
         if lat and lng:
@@ -257,37 +272,38 @@ def search():
         else:
             results.sort(key=lambda x: -x['quantity'])
 
-        medicine_check = conn.execute(
-            'SELECT * FROM medicines WHERE LOWER(name) LIKE LOWER(?)', ('%' + query + '%',)
-        ).fetchone()
-        medicine_exists = medicine_check is not None
+        if query:
+            medicine_check = conn.execute(
+                'SELECT * FROM medicines WHERE LOWER(name) LIKE LOWER(?)', ('%' + query + '%',)
+            ).fetchone()
+            medicine_exists = medicine_check is not None
 
-        # If no results found, look for generic-name alternatives
-        if not results and medicine_check and medicine_check['generic_name']:
-            generic = medicine_check['generic_name']
-            alt_rows = conn.execute('''
-                SELECT pharmacies.name AS pharmacy_name,
-                       pharmacies.address,
-                       pharmacies.contact,
-                       medicines.name AS medicine_name,
-                       medicines.generic_name,
-                       inventory.quantity,
-                       inventory.price
-                FROM inventory
-                JOIN pharmacies ON inventory.pharmacy_id = pharmacies.id
-                JOIN medicines ON inventory.medicine_id = medicines.id
-                WHERE LOWER(medicines.generic_name) = LOWER(?)
-                  AND LOWER(medicines.name) != LOWER(?)
-                  AND inventory.quantity > 0
-                ORDER BY inventory.quantity DESC
-            ''', (generic, query)).fetchall()
-            alternatives = [dict(row) for row in alt_rows]
+            if not results and medicine_check and medicine_check['generic_name']:
+                generic = medicine_check['generic_name']
+                alt_rows = conn.execute('''
+                    SELECT pharmacies.name AS pharmacy_name,
+                           pharmacies.address,
+                           pharmacies.contact,
+                           medicines.name AS medicine_name,
+                           medicines.generic_name,
+                           inventory.quantity,
+                           inventory.price
+                    FROM inventory
+                    JOIN pharmacies ON inventory.pharmacy_id = pharmacies.id
+                    JOIN medicines ON inventory.medicine_id = medicines.id
+                    WHERE LOWER(medicines.generic_name) = LOWER(?)
+                      AND LOWER(medicines.name) != LOWER(?)
+                      AND inventory.quantity > 0
+                    ORDER BY inventory.quantity DESC
+                ''', (generic, query)).fetchall()
+                alternatives = [dict(row) for row in alt_rows]
 
-        conn.close()
+    conn.close()
 
     return render_template('search.html', query=query, results=results,
                             medicine_exists=medicine_exists, lat=lat,
-                            alternatives=alternatives)
+                            alternatives=alternatives, all_categories=all_categories,
+                            selected_category=category)
 @app.route('/upload-prescription', methods=['GET', 'POST'])
 def upload_prescription():
     if 'user_id' not in session:

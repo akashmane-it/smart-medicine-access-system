@@ -15,7 +15,15 @@
         <h1>Search for a Medicine</h1>
 
         <form method="GET" action="/search" id="searchForm">
-            <input type="text" name="query" placeholder="Enter medicine name" value="{{ query|default('') }}" required style="max-width: 320px; display: inline-block;">
+            <input type="text" name="query" placeholder="Enter medicine name (optional)" value="{{ query|default('') }}" style="max-width: 280px; display: inline-block;">
+
+            <select name="category" style="padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1em; max-width: 200px;">
+                <option value="">All Categories</option>
+                {% for cat in all_categories %}
+                <option value="{{ cat['category'] }}" {% if cat['category'] == selected_category %}selected{% endif %}>{{ cat['category'] }}</option>
+                {% endfor %}
+            </select>
+
             <input type="hidden" name="lat" id="lat" value="{{ lat|default('') }}">
             <input type="hidden" name="lng" id="lng" value="{{ lng|default('') }}">
             <button type="submit">Search</button>
@@ -40,8 +48,8 @@
             }
         </script>
 
-        {% if query %}
-            <h2>Results for "{{ query }}"</h2>
+        {% if query or selected_category %}
+            <h2>Results {% if query %}for "{{ query }}"{% endif %}{% if selected_category %} in category "{{ selected_category }}"{% endif %}</h2>
 
             {% if results %}
             <p>✅ Found at {{ results|length }} pharmacy/pharmacies:</p>
@@ -85,18 +93,20 @@
                 </tr>
                 {% endfor %}
             </table>
-            {% elif medicine_exists %}
+            {% elif query and medicine_exists %}
                 <p class="error">⚠️ "{{ query }}" is known but currently out of stock at all registered pharmacies.</p>
                 <form method="POST" action="/request-medicine">
                     <input type="hidden" name="medicine_name" value="{{ query }}">
                     <button type="submit">Notify me when available</button>
                 </form>
-            {% else %}
+            {% elif query %}
                 <p class="error">❌ No medicine matching "{{ query }}" was found in our system.</p>
                 <form method="POST" action="/request-medicine">
                     <input type="hidden" name="medicine_name" value="{{ query }}">
                     <button type="submit">Request this medicine</button>
                 </form>
+            {% else %}
+                <p class="error">No medicines found in this category.</p>
             {% endif %}
 
             {% if alternatives %}
