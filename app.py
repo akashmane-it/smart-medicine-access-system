@@ -2,6 +2,7 @@ import os
 import pytesseract
 from PIL import Image
 from werkzeug.utils import secure_filename
+from rapidfuzz import fuzz
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
@@ -329,8 +330,19 @@ def upload_prescription():
             conn.close()
 
             extracted_lower = extracted_text.lower()
+
             for med in all_medicines:
-                if med['name'].lower() in extracted_lower:
+                med_name_lower = med['name'].lower()
+
+                # Exact match (substring) - fastest, most reliable
+                if med_name_lower in extracted_lower:
+                    matched_medicines.append(med['name'])
+                    continue
+
+                # Fuzzy match - checks if medicine name closely matches
+                # any part of the extracted text, handling multi-word names and OCR typos
+                similarity = fuzz.partial_ratio(med_name_lower, extracted_lower)
+                if similarity >= 75:
                     matched_medicines.append(med['name'])
 
     return render_template('upload_prescription.html',
