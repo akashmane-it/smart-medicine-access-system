@@ -100,6 +100,37 @@
             </tr>
             {% endfor %}
         </table>
+
+        <h3>📊 Top Requested (Unavailable) Medicines</h3>
+        {% if top_requested %}
+        <table>
+            <tr><th>Medicine</th><th>Times Requested</th></tr>
+            {% for t in top_requested %}
+            <tr>
+                <td>{{ t['medicine_name'] }}</td>
+                <td>{{ t['request_count'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No requests recorded yet.</p>
+        {% endif %}
+
+        <h3>⚠️ System-Wide Low Stock (below 10 units)</h3>
+        {% if low_stock %}
+        <table>
+            <tr><th>Medicine</th><th>Pharmacy</th><th>Quantity Left</th></tr>
+            {% for l in low_stock %}
+            <tr style="background-color: #fef3c7;">
+                <td>{{ l['medicine_name'] }}</td>
+                <td>{{ l['pharmacy_name'] }}</td>
+                <td>{{ l['quantity'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No low-stock items currently.</p>
+        {% endif %}
     </div>
 </body>
 </html>

@@ -395,6 +395,24 @@ def admin_dashboard():
         JOIN users ON requests.user_id = users.id
         ORDER BY requests.created_at DESC
     ''').fetchall()
+
+    top_requested = conn.execute('''
+        SELECT medicine_name, COUNT(*) AS request_count
+        FROM requests
+        GROUP BY LOWER(medicine_name)
+        ORDER BY request_count DESC
+        LIMIT 5
+    ''').fetchall()
+
+    low_stock = conn.execute('''
+        SELECT medicines.name AS medicine_name, pharmacies.name AS pharmacy_name, inventory.quantity
+        FROM inventory
+        JOIN medicines ON inventory.medicine_id = medicines.id
+        JOIN pharmacies ON inventory.pharmacy_id = pharmacies.id
+        WHERE inventory.quantity < 10
+        ORDER BY inventory.quantity ASC
+    ''').fetchall()
+
     conn.close()
 
     return render_template('admin_dashboard.html',
@@ -405,7 +423,9 @@ def admin_dashboard():
                             pharmacies=pharmacies,
                             users=users,
                             medicines=medicines,
-                            all_requests=all_requests)
+                            all_requests=all_requests,
+                            top_requested=top_requested,
+                            low_stock=low_stock)
 
 @app.route('/admin/logout')
 def admin_logout():
