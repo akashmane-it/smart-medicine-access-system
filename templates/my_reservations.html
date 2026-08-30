@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Reservations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container">
+        <h1>My Reservations</h1>
+
+        <table>
+            <tr>
+                <th>Medicine</th>
+                <th>Pharmacy</th>
+                <th>Quantity</th>
+                <th>Requested On</th>
+                <th>Status</th>
+            </tr>
+            {% for r in reservations %}
+            <tr>
+                <td>{{ r['medicine_name'] }}</td>
+                <td>{{ r['pharmacy_name'] }}</td>
+                <td>{{ r['quantity'] }}</td>
+                <td>{{ r['created_at'] }}</td>
+                <td>
+                    {% if r['status'] == 'pending' %}
+                        <span class="badge-pending">Pending</span>
+                    {% elif r['status'] == 'confirmed' %}
+                        <span class="badge-success">Confirmed — visit pharmacy to collect</span>
+                    {% else %}
+                        <span class="badge-pending" style="background:#fee2e2; color:#b91c1c;">Rejected</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">You haven't reserved any medicines yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

@@ -18,6 +18,7 @@
         <div class="action-links">
             <a href="/pharmacy/add-medicine" class="link-teal">➕ Add / Update Medicine Stock</a>
             <a href="/pharmacy/requests" class="link-teal">📋 View Medicine Requests</a>
+            <a href="/pharmacy/reservations" class="link-teal">🛒 Incoming Reservations</a>
         </div>
 
         <h2>Your Medicine Stock</h2>
@@ -27,17 +28,28 @@
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Last Updated</th>
+                <th>Action</th>
             </tr>
             {% for item in inventory %}
-            <tr>
-                <td>{{ item['name'] }}</td>
+            <tr {% if item['quantity'] < 10 %}style="background-color: #fef3c7;"{% endif %}>
+                <td>
+                    {{ item['name'] }}
+                    {% if item['quantity'] < 10 %}<span class="badge-pending">Low Stock</span>{% endif %}
+                </td>
                 <td>{{ item['quantity'] }}</td>
                 <td>₹{{ item['price'] }}</td>
                 <td>{{ item['updated_at'] }}</td>
+                <td>
+                    <a href="/pharmacy/edit-medicine/{{ item['inventory_id'] }}">Edit</a>
+                    &nbsp;|&nbsp;
+                    <form method="POST" action="/pharmacy/remove-medicine/{{ item['inventory_id'] }}" style="display:inline;" onsubmit="return confirm('Remove this medicine from your stock?');">
+                        <button type="submit" class="btn-danger" style="margin-top:0; padding:4px 10px; font-size:0.8em;">Remove</button>
+                    </form>
+                </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="4">No medicines added yet.</td>
+                <td colspan="5">No medicines added yet.</td>
             </tr>
             {% endfor %}
         </table>

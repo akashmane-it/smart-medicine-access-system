@@ -88,9 +88,30 @@ def create_requests_table():
     conn.close()
     print("Requests table created successfully!")
 
+def create_reservations_table():
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS reservations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            pharmacy_id INTEGER NOT NULL,
+            medicine_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL DEFAULT 1,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (pharmacy_id) REFERENCES pharmacies (id),
+            FOREIGN KEY (medicine_id) REFERENCES medicines (id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
+    print("Reservations table created successfully!")
+
 if __name__ == '__main__':
     create_users_table()
     create_pharmacies_table()
     create_medicines_table()
     create_inventory_table()
     create_requests_table()
+    create_reservations_table()

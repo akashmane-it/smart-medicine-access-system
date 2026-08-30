@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Incoming Reservations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar pharmacy">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/pharmacy/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Incoming Reservations</h1>
+
+        <table>
+            <tr>
+                <th>Customer</th>
+                <th>Medicine</th>
+                <th>Quantity</th>
+                <th>Requested On</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for r in reservations %}
+            <tr>
+                <td>{{ r['user_name'] }}</td>
+                <td>{{ r['medicine_name'] }}</td>
+                <td>{{ r['quantity'] }}</td>
+                <td>{{ r['created_at'] }}</td>
+                <td>
+                    {% if r['status'] == 'pending' %}
+                        <span class="badge-pending">Pending</span>
+                    {% elif r['status'] == 'confirmed' %}
+                        <span class="badge-success">Confirmed</span>
+                    {% else %}
+                        <span class="badge-pending" style="background:#fee2e2; color:#b91c1c;">Rejected</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r['status'] == 'pending' %}
+                    <form method="POST" action="/pharmacy/confirm-reservation/{{ r['id'] }}" style="display:inline;">
+                        <button type="submit" class="btn-teal" style="margin-top:0; padding:6px 12px; font-size:0.8em;">Confirm</button>
+                    </form>
+                    <form method="POST" action="/pharmacy/reject-reservation/{{ r['id'] }}" style="display:inline;">
+                        <button type="submit" class="btn-danger" style="margin-top:0; padding:6px 12px; font-size:0.8em;">Reject</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">No reservations yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

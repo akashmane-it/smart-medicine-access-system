@@ -54,6 +54,7 @@
                     <th>Price</th>
                     <th>Contact</th>
                     {% if lat %}<th>Distance</th>{% endif %}
+                    <th>Action</th>
                 </tr>
                 {% for item in results %}
                 <tr>
@@ -73,6 +74,14 @@
                         {% endif %}
                     </td>
                     {% endif %}
+                    <td>
+                        <form method="POST" action="/reserve-medicine" style="margin:0;">
+                            <input type="hidden" name="pharmacy_id" value="{{ item['pharmacy_id'] }}">
+                            <input type="hidden" name="medicine_id" value="{{ item['medicine_id'] }}">
+                            <input type="number" name="quantity" min="1" max="{{ item['quantity'] }}" value="1" style="width:60px; display:inline; padding:6px;">
+                            <button type="submit" style="margin-top:0; padding:8px 14px; font-size:0.85em;">Reserve</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>

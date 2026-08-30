@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Medicine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar pharmacy">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/pharmacy/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container" style="max-width: 560px;">
+        <h1>Edit Medicine</h1>
+
+        <form method="POST" action="/pharmacy/edit-medicine/{{ item['inventory_id'] }}">
+            <label>Medicine Name</label>
+            <input type="text" name="medicine_name" value="{{ item['name'] }}" required>
+
+            <label>Generic Name</label>
+            <input type="text" name="generic_name" value="{{ item['generic_name'] or '' }}">
+
+            <label>Category</label>
+            <input type="text" name="category" value="{{ item['category'] or '' }}">
+
+            <label>Quantity</label>
+            <input type="number" name="quantity" min="0" value="{{ item['quantity'] }}" required>
+
+            <label>Price (₹)</label>
+            <input type="number" name="price" step="0.01" min="0" value="{{ item['price'] }}" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

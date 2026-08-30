@@ -130,7 +130,8 @@ def pharmacy_dashboard():
 
     conn = get_db_connection()
     inventory = conn.execute('''
-        SELECT medicines.name, inventory.quantity, inventory.price, inventory.updated_at
+        SELECT inventory.id AS inventory_id, medicines.name, medicines.generic_name,
+               medicines.category, inventory.quantity, inventory.price, inventory.updated_at
         FROM inventory
         JOIN medicines ON inventory.medicine_id = medicines.id
         WHERE inventory.pharmacy_id = ?
@@ -222,11 +223,13 @@ def search():
     if query:
         conn = get_db_connection()
         rows = conn.execute('''
-            SELECT pharmacies.name AS pharmacy_name,
+            SELECT pharmacies.id AS pharmacy_id,
+                   pharmacies.name AS pharmacy_name,
                    pharmacies.address,
                    pharmacies.contact,
                    pharmacies.latitude,
                    pharmacies.longitude,
+                   medicines.id AS medicine_id,
                    medicines.name AS medicine_name,
                    inventory.quantity,
                    inventory.price
@@ -476,5 +479,139 @@ def find_pharmacy_for_all():
                             requested_medicines=requested_medicines,
                             full_matches=full_matches,
                             partial_matches=partial_matches)
+@app.route('/pharmacy/edit-medicine/<int:inventory_id>', methods=['GET', 'POST'])
+def edit_medicine(inventory_id):
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('pharmacy_login'))
+
+    conn = get_db_connection()
+
+    if request.method == 'POST':
+        medicine_name = request.form['medicine_name'].strip()
+        generic_name = request.form['generic_name'].strip()
+        category = request.form['category'].strip()
+        quantity = request.form['quantity']
+        price = request.form['price']
+
+        # get the medicine_id linked to this inventory row
+        inv_row = conn.execute('SELECT medicine_id FROM inventory WHERE id = ? AND pharmacy_id = ?',
+                                (inventory_id, session['pharmacy_id'])).fetchone()
+        if inv_row:
+            conn.execute('UPDATE medicines SET name = ?, generic_name = ?, category = ? WHERE id = ?',
+                         (medicine_name, generic_name, category, inv_row['medicine_id']))
+            conn.execute('UPDATE inventory SET quantity = ?, price = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+                         (quantity, price, inventory_id))
+            conn.commit()
+
+        conn.close()
+        return redirect(url_for('pharmacy_dashboard'))
+
+    item = conn.execute('''
+        SELECT inventory.id AS inventory_id, medicines.name, medicines.generic_name,
+               medicines.category, inventory.quantity, inventory.price
+        FROM inventory
+        JOIN medicines ON inventory.medicine_id = medicines.id
+        WHERE inventory.id = ? AND inventory.pharmacy_id = ?
+    ''', (inventory_id, session['pharmacy_id'])).fetchone()
+    conn.close()
+
+    if not item:
+        return redirect(url_for('pharmacy_dashboard'))
+
+    return render_template('edit_medicine.html', item=item)
+
+@app.route('/pharmacy/remove-medicine/<int:inventory_id>', methods=['POST'])
+def remove_medicine(inventory_id):
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('pharmacy_login'))
+
+    conn = get_db_connection()
+    conn.execute('DELETE FROM inventory WHERE id = ? AND pharmacy_id = ?',
+                 (inventory_id, session['pharmacy_id']))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('pharmacy_dashboard'))
+@app.route('/reserve-medicine', methods=['POST'])
+def reserve_medicine():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    pharmacy_id = request.form['pharmacy_id']
+    medicine_id = request.form['medicine_id']
+    quantity = request.form['quantity']
+
+    conn = get_db_connection()
+    conn.execute(
+        'INSERT INTO reservations (user_id, pharmacy_id, medicine_id, quantity) VALUES (?, ?, ?, ?)',
+        (session['user_id'], pharmacy_id, medicine_id, quantity)
+    )
+    conn.commit()
+    conn.close()
+
+    return "Reservation submitted! The pharmacy will confirm your order. <br><a href='/search'>Back to Search</a> | <a href='/my-reservations'>View My Reservations</a>"
+@app.route('/pharmacy/reservations')
+def pharmacy_reservations():
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('pharmacy_login'))
+
+    conn = get_db_connection()
+    reservations = conn.execute('''
+        SELECT reservations.id, reservations.quantity, reservations.status, reservations.created_at,
+               users.name AS user_name, medicines.name AS medicine_name
+        FROM reservations
+        JOIN users ON reservations.user_id = users.id
+        JOIN medicines ON reservations.medicine_id = medicines.id
+        WHERE reservations.pharmacy_id = ?
+        ORDER BY reservations.created_at DESC
+    ''', (session['pharmacy_id'],)).fetchall()
+    conn.close()
+
+    return render_template('pharmacy_reservations.html', reservations=reservations)
+
+@app.route('/pharmacy/confirm-reservation/<int:reservation_id>', methods=['POST'])
+def confirm_reservation(reservation_id):
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('pharmacy_login'))
+
+    conn = get_db_connection()
+    conn.execute('UPDATE reservations SET status = ? WHERE id = ? AND pharmacy_id = ?',
+                 ('confirmed', reservation_id, session['pharmacy_id']))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('pharmacy_reservations'))
+
+@app.route('/pharmacy/reject-reservation/<int:reservation_id>', methods=['POST'])
+def reject_reservation(reservation_id):
+    if 'pharmacy_id' not in session:
+        return redirect(url_for('pharmacy_login'))
+
+    conn = get_db_connection()
+    conn.execute('UPDATE reservations SET status = ? WHERE id = ? AND pharmacy_id = ?',
+                 ('rejected', reservation_id, session['pharmacy_id']))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('pharmacy_reservations'))
+
+@app.route('/my-reservations')
+def my_reservations():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    reservations = conn.execute('''
+        SELECT reservations.quantity, reservations.status, reservations.created_at,
+               pharmacies.name AS pharmacy_name, medicines.name AS medicine_name
+        FROM reservations
+        JOIN pharmacies ON reservations.pharmacy_id = pharmacies.id
+        JOIN medicines ON reservations.medicine_id = medicines.id
+        WHERE reservations.user_id = ?
+        ORDER BY reservations.created_at DESC
+    ''', (session['user_id'],)).fetchall()
+    conn.close()
+
+    return render_template('my_reservations.html', reservations=reservations)
 if __name__ == '__main__':
     app.run(debug=True)
