@@ -37,6 +37,15 @@
             </form>
         </div>
 
+        <div class="status-box">
+            <strong>Need multiple medicines?</strong> Find one pharmacy that has all of them.
+            <form method="POST" action="/find-pharmacy-for-all" style="margin-top:8px;">
+                <input type="text" name="medicines" placeholder="e.g. Paracetamol, Dolo 650, Naproxen" style="max-width: 400px; display: inline-block;">
+                <button type="submit" style="margin-top:0;">Find Pharmacy With All</button>
+            </form>
+            <p style="font-size:0.85em; margin-top:6px; margin-bottom:0;">Separate medicine names with commas.</p>
+        </div>
+
         <p class="status-box" id="locationStatus">📍 Getting your location...</p>
 
         <script>

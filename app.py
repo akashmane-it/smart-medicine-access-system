@@ -524,7 +524,10 @@ def find_pharmacy_for_all():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    # Handle both: checkbox list (from prescription) and comma-separated text (manual entry)
     requested_medicines = request.form.getlist('medicines')
+    if len(requested_medicines) == 1 and ',' in requested_medicines[0]:
+        requested_medicines = [m.strip() for m in requested_medicines[0].split(',') if m.strip()]
 
     conn = get_db_connection()
     pharmacies = conn.execute('SELECT * FROM pharmacies').fetchall()
