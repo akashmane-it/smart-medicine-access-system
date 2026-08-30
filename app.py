@@ -432,6 +432,14 @@ def admin_dashboard():
         ORDER BY inventory.quantity ASC
     ''').fetchall()
 
+    category_distribution = conn.execute('''
+        SELECT category, COUNT(*) AS count
+        FROM medicines
+        WHERE category IS NOT NULL AND category != ''
+        GROUP BY LOWER(category)
+        ORDER BY count DESC
+    ''').fetchall()
+
     conn.close()
 
     return render_template('admin_dashboard.html',
@@ -445,7 +453,8 @@ def admin_dashboard():
                             medicines=medicines,
                             all_requests=all_requests,
                             top_requested=top_requested,
-                            low_stock=low_stock)
+                            low_stock=low_stock,
+                            category_distribution=category_distribution)
 
 @app.route('/admin/logout')
 def admin_logout():

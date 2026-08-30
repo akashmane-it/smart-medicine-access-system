@@ -137,8 +137,20 @@
             </tr>
             {% endfor %}
         </table>
+        <div style="max-width: 600px; margin: 20px 0;">
+            <canvas id="requestsChart"></canvas>
+        </div>
         {% else %}
         <p>No requests recorded yet.</p>
+        {% endif %}
+
+        <h3>📈 Medicines by Category</h3>
+        {% if category_distribution %}
+        <div style="max-width: 400px; margin: 20px 0;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        {% else %}
+        <p>No category data available.</p>
         {% endif %}
 
         <h3>⚠️ System-Wide Low Stock (below 10 units)</h3>
@@ -157,5 +169,45 @@
         <p>No low-stock items currently.</p>
         {% endif %}
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script>
+        {% if top_requested %}
+        new Chart(document.getElementById('requestsChart'), {
+            type: 'bar',
+            data: {
+                labels: [{% for t in top_requested %}"{{ t['medicine_name'] }}",{% endfor %}],
+                datasets: [{
+                    label: 'Times Requested',
+                    data: [{% for t in top_requested %}{{ t['request_count'] }},{% endfor %}],
+                    backgroundColor: '#2563eb',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+        {% endif %}
+
+        {% if category_distribution %}
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'pie',
+            data: {
+                labels: [{% for c in category_distribution %}"{{ c['category'] }}",{% endfor %}],
+                datasets: [{
+                    data: [{% for c in category_distribution %}{{ c['count'] }},{% endfor %}],
+                    backgroundColor: ['#2563eb', '#0d9488', '#7c3aed', '#f97316', '#db2777', '#facc15', '#16a34a']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+        {% endif %}
+    </script>
 </body>
 </html>
