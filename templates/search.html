@@ -29,6 +29,14 @@
             <button type="submit">Search</button>
         </form>
 
+        <div class="status-box">
+            <strong>Not sure what medicine you need?</strong> Tell us your symptom:
+            <form method="GET" action="/search" style="margin-top:8px;">
+                <input type="text" name="symptom" placeholder="e.g. fever, headache, cold" style="max-width: 250px; display: inline-block;">
+                <button type="submit" style="margin-top:0;">Suggest Category</button>
+            </form>
+        </div>
+
         <p class="status-box" id="locationStatus">📍 Getting your location...</p>
 
         <script>

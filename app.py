@@ -4,6 +4,21 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 from rapidfuzz import fuzz
 
+SYMPTOM_TO_CATEGORY = {
+    "fever": "Painkiller",
+    "headache": "Painkiller",
+    "body pain": "Painkiller",
+    "pain": "Painkiller",
+    "cold": "Antibiotic",
+    "cough": "Antibiotic",
+    "infection": "Antibiotic",
+    "throat pain": "Antibiotic",
+    "injury": "trauma",
+    "wound": "trauma",
+    "cut": "trauma",
+    "sprain": "trauma",
+}
+
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -218,6 +233,13 @@ def search():
 
     query = request.args.get('query', '').strip()
     category = request.args.get('category', '').strip()
+    symptom = request.args.get('symptom', '').strip().lower()
+
+    if symptom and not category:
+        for keyword, mapped_category in SYMPTOM_TO_CATEGORY.items():
+            if keyword in symptom:
+                category = mapped_category
+                break
     lat = request.args.get('lat', '').strip()
     lng = request.args.get('lng', '').strip()
     results = []
