@@ -547,9 +547,14 @@ def reserve_medicine():
         (session['user_id'], pharmacy_id, medicine_id, quantity)
     )
     conn.commit()
+
+    pharmacy = conn.execute('SELECT name FROM pharmacies WHERE id = ?', (pharmacy_id,)).fetchone()
+    medicine = conn.execute('SELECT name FROM medicines WHERE id = ?', (medicine_id,)).fetchone()
     conn.close()
 
-    return "Reservation submitted! The pharmacy will confirm your order. <br><a href='/search'>Back to Search</a> | <a href='/my-reservations'>View My Reservations</a>"
+    return render_template('reservation_success.html',
+                            pharmacy_name=pharmacy['name'],
+                            medicine_name=medicine['name'])
 @app.route('/pharmacy/reservations')
 def pharmacy_reservations():
     if 'pharmacy_id' not in session:

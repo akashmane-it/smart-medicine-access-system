@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation Submitted</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container" style="max-width: 520px; text-align: center;">
+        <div style="font-size: 3em; margin-bottom: 10px;">✅</div>
+        <h1>Reservation Submitted!</h1>
+        <p class="success-box">
+            Your reservation for <strong>{{ medicine_name }}</strong> at <strong>{{ pharmacy_name }}</strong> has been sent. The pharmacy will confirm it shortly.
+        </p>
+
+        <div class="action-links" style="justify-content: center;">
+            <a href="/my-reservations" class="link-blue">🛒 View My Reservations</a>
+            <a href="/search" class="link-purple">🔍 Search More Medicines</a>
+        </div>
+    </div>
+</body>
+</html>
