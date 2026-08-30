@@ -115,6 +115,8 @@ def pharmacy_login():
         conn.close()
 
         if pharmacy and check_password_hash(pharmacy['password'], password):
+            if pharmacy['is_approved'] == 0:
+                return render_template('pharmacy_login.html', error='Your pharmacy account is pending admin approval. Please check back later.')
             session['pharmacy_id'] = pharmacy['id']
             session['pharmacy_name'] = pharmacy['name']
             return redirect(url_for('pharmacy_dashboard'))
@@ -385,7 +387,8 @@ def admin_dashboard():
     total_pharmacies = conn.execute('SELECT COUNT(*) FROM pharmacies').fetchone()[0]
     total_medicines = conn.execute('SELECT COUNT(*) FROM medicines').fetchone()[0]
     total_requests = conn.execute('SELECT COUNT(*) FROM requests').fetchone()[0]
-    pharmacies = conn.execute('SELECT * FROM pharmacies').fetchall()
+    pharmacies = conn.execute('SELECT * FROM pharmacies WHERE is_approved = 1').fetchall()
+    pending_pharmacies = conn.execute('SELECT * FROM pharmacies WHERE is_approved = 0').fetchall()
     users = conn.execute('SELECT * FROM users').fetchall()
     medicines = conn.execute('SELECT * FROM medicines').fetchall()
     all_requests = conn.execute('''
@@ -421,6 +424,7 @@ def admin_dashboard():
                             total_medicines=total_medicines,
                             total_requests=total_requests,
                             pharmacies=pharmacies,
+                            pending_pharmacies=pending_pharmacies,
                             users=users,
                             medicines=medicines,
                             all_requests=all_requests,
@@ -638,5 +642,28 @@ def my_reservations():
     conn.close()
 
     return render_template('my_reservations.html', reservations=reservations)
+@app.route('/admin/approve-pharmacy/<int:pharmacy_id>', methods=['POST'])
+def approve_pharmacy(pharmacy_id):
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+
+    conn = get_db_connection()
+    conn.execute('UPDATE pharmacies SET is_approved = 1 WHERE id = ?', (pharmacy_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/reject-pharmacy/<int:pharmacy_id>', methods=['POST'])
+def reject_pharmacy(pharmacy_id):
+    if not session.get('is_admin'):
+        return redirect(url_for('admin_login'))
+
+    conn = get_db_connection()
+    conn.execute('DELETE FROM pharmacies WHERE id = ?', (pharmacy_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('admin_dashboard'))
 if __name__ == '__main__':
     app.run(debug=True)

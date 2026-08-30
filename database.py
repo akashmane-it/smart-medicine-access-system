@@ -32,6 +32,7 @@ def create_pharmacies_table():
             latitude REAL,
             longitude REAL,
             contact TEXT,
+            is_approved INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')

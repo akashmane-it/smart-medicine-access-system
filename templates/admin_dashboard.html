@@ -33,6 +33,31 @@
             </div>
         </div>
 
+        <h3>🕓 Pending Pharmacy Approvals</h3>
+        {% if pending_pharmacies %}
+        <table>
+            <tr><th>Name</th><th>Email</th><th>Address</th><th>Contact</th><th>Action</th></tr>
+            {% for p in pending_pharmacies %}
+            <tr style="background-color: #fef3c7;">
+                <td>{{ p['name'] }}</td>
+                <td>{{ p['email'] }}</td>
+                <td>{{ p['address'] }}</td>
+                <td>{{ p['contact'] }}</td>
+                <td>
+                    <form method="POST" action="/admin/approve-pharmacy/{{ p['id'] }}" style="display:inline;">
+                        <button type="submit" class="btn-teal" style="margin-top:0; padding:6px 12px; font-size:0.8em;">Approve</button>
+                    </form>
+                    <form method="POST" action="/admin/reject-pharmacy/{{ p['id'] }}" style="display:inline;" onsubmit="return confirm('Reject and delete this pharmacy registration?');">
+                        <button type="submit" class="btn-danger" style="margin-top:0; padding:6px 12px; font-size:0.8em;">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No pending approvals.</p>
+        {% endif %}
+
         <h3>All Pharmacies</h3>
         <table>
             <tr><th>Name</th><th>Email</th><th>Address</th><th>Contact</th><th>Action</th></tr>
