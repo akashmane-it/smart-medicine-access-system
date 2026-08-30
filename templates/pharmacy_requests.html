@@ -43,7 +43,12 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">No requests yet.</td></tr>
+            <tr><td colspan="5">
+                <div class="empty-state">
+                    <div class="empty-icon">🔔</div>
+                    <p>No medicine requests yet. You'll see them here when patients need something you're out of.</p>
+                </div>
+            </td></tr>
             {% endfor %}
         </table>
     </div>

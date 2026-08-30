@@ -39,7 +39,12 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">You haven't reserved any medicines yet.</td></tr>
+            <tr><td colspan="5">
+                <div class="empty-state">
+                    <div class="empty-icon">🛒</div>
+                    <p>You haven't reserved any medicines yet. Search and reserve to see them here.</p>
+                </div>
+            </td></tr>
             {% endfor %}
         </table>
     </div>

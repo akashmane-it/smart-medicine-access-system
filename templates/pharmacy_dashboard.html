@@ -49,7 +49,12 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5">No medicines added yet.</td>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <p>No medicines in stock yet. Click "Add / Update Medicine Stock" to get started.</p>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </table>
