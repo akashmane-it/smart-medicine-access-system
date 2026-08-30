@@ -89,6 +89,30 @@
                     <button type="submit">Request this medicine</button>
                 </form>
             {% endif %}
+
+            {% if alternatives %}
+                <h3>💊 Available Alternatives (same generic composition)</h3>
+                <table>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Generic Name</th>
+                        <th>Pharmacy</th>
+                        <th>Address</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    {% for alt in alternatives %}
+                    <tr>
+                        <td>{{ alt['medicine_name'] }}</td>
+                        <td>{{ alt['generic_name'] }}</td>
+                        <td>{{ alt['pharmacy_name'] }}</td>
+                        <td>{{ alt['address'] }}</td>
+                        <td>{{ alt['quantity'] }}</td>
+                        <td>₹{{ alt['price'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
         {% endif %}
     </div>
 </body>

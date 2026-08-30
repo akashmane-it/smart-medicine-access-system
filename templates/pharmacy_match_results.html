@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmacy Match Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container">
+        <h1>Pharmacy Match Results</h1>
+        <p>You needed: <strong>{{ requested_medicines|join(', ') }}</strong></p>
+
+        {% if full_matches %}
+            <h2>✅ Pharmacies with ALL medicines in stock</h2>
+            <table>
+                <tr>
+                    <th>Pharmacy</th>
+                    <th>Address</th>
+                    <th>Contact</th>
+                    <th>Directions</th>
+                </tr>
+                {% for pharmacy in full_matches %}
+                <tr>
+                    <td>{{ pharmacy['name'] }}</td>
+                    <td>{{ pharmacy['address'] }}</td>
+                    <td>{{ pharmacy['contact'] }}</td>
+                    <td>
+                        {% if pharmacy['latitude'] and pharmacy['longitude'] %}
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ pharmacy['latitude'] }},{{ pharmacy['longitude'] }}" target="_blank">Get Directions</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="error">⚠️ No single pharmacy has all requested medicines in stock. See partial matches below.</p>
+        {% endif %}
+
+        <h2>Partial Matches (pharmacy has some, not all)</h2>
+        {% if partial_matches %}
+            <table>
+                <tr>
+                    <th>Pharmacy</th>
+                    <th>Has</th>
+                    <th>Missing</th>
+                    <th>Address</th>
+                </tr>
+                {% for p in partial_matches %}
+                <tr>
+                    <td>{{ p['name'] }}</td>
+                    <td>{{ p['has']|join(', ') }}</td>
+                    <td>{{ p['missing']|join(', ') }}</td>
+                    <td>{{ p['address'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No partial matches found either.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

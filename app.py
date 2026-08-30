@@ -217,6 +217,7 @@ def search():
     lng = request.args.get('lng', '').strip()
     results = []
     medicine_exists = True
+    alternatives = []
 
     if query:
         conn = get_db_connection()
@@ -247,7 +248,6 @@ def search():
                     )
                 else:
                     item['distance'] = None
-            # sort by distance, pharmacies without GPS go to the end
             results.sort(key=lambda x: (x['distance'] is None, x['distance']))
         else:
             results.sort(key=lambda x: -x['quantity'])
@@ -257,9 +257,32 @@ def search():
         ).fetchone()
         medicine_exists = medicine_check is not None
 
+        # If no results found, look for generic-name alternatives
+        if not results and medicine_check and medicine_check['generic_name']:
+            generic = medicine_check['generic_name']
+            alt_rows = conn.execute('''
+                SELECT pharmacies.name AS pharmacy_name,
+                       pharmacies.address,
+                       pharmacies.contact,
+                       medicines.name AS medicine_name,
+                       medicines.generic_name,
+                       inventory.quantity,
+                       inventory.price
+                FROM inventory
+                JOIN pharmacies ON inventory.pharmacy_id = pharmacies.id
+                JOIN medicines ON inventory.medicine_id = medicines.id
+                WHERE LOWER(medicines.generic_name) = LOWER(?)
+                  AND LOWER(medicines.name) != LOWER(?)
+                  AND inventory.quantity > 0
+                ORDER BY inventory.quantity DESC
+            ''', (generic, query)).fetchall()
+            alternatives = [dict(row) for row in alt_rows]
+
         conn.close()
 
-    return render_template('search.html', query=query, results=results, medicine_exists=medicine_exists, lat=lat)
+    return render_template('search.html', query=query, results=results,
+                            medicine_exists=medicine_exists, lat=lat,
+                            alternatives=alternatives)
 @app.route('/upload-prescription', methods=['GET', 'POST'])
 def upload_prescription():
     if 'user_id' not in session:
@@ -410,5 +433,48 @@ def delete_user(user_id):
     conn.close()
 
     return redirect(url_for('admin_dashboard'))
+@app.route('/find-pharmacy-for-all', methods=['POST'])
+def find_pharmacy_for_all():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    requested_medicines = request.form.getlist('medicines')
+
+    conn = get_db_connection()
+    pharmacies = conn.execute('SELECT * FROM pharmacies').fetchall()
+
+    full_matches = []
+    partial_matches = []
+
+    for pharmacy in pharmacies:
+        stock = conn.execute('''
+            SELECT medicines.name
+            FROM inventory
+            JOIN medicines ON inventory.medicine_id = medicines.id
+            WHERE inventory.pharmacy_id = ? AND inventory.quantity > 0
+        ''', (pharmacy['id'],)).fetchall()
+
+        stocked_names = [row['name'].lower() for row in stock]
+        requested_lower = [m.lower() for m in requested_medicines]
+
+        has = [m for m in requested_medicines if m.lower() in stocked_names]
+        missing = [m for m in requested_medicines if m.lower() not in stocked_names]
+
+        if len(has) == len(requested_medicines):
+            full_matches.append(dict(pharmacy))
+        elif len(has) > 0:
+            partial_matches.append({
+                'name': pharmacy['name'],
+                'address': pharmacy['address'],
+                'has': has,
+                'missing': missing
+            })
+
+    conn.close()
+
+    return render_template('pharmacy_match_results.html',
+                            requested_medicines=requested_medicines,
+                            full_matches=full_matches,
+                            partial_matches=partial_matches)
 if __name__ == '__main__':
     app.run(debug=True)

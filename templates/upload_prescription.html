@@ -27,11 +27,16 @@
 
             <h2>Matched Medicines</h2>
             {% if matched_medicines %}
-                <div class="action-links">
-                {% for med in matched_medicines %}
-                    <a href="/search?query={{ med }}">🔍 {{ med }}</a>
-                {% endfor %}
-                </div>
+                <form method="POST" action="/find-pharmacy-for-all">
+                    <p>Select the medicines you need, then find a pharmacy that has all of them:</p>
+                    {% for med in matched_medicines %}
+                        <label style="font-weight: normal; display: block; margin-top: 8px;">
+                            <input type="checkbox" name="medicines" value="{{ med }}" checked style="width: auto; display: inline;">
+                            {{ med }}
+                        </label>
+                    {% endfor %}
+                    <button type="submit">🏥 Find Pharmacy With All Medicines</button>
+                </form>
             {% else %}
                 <p class="error">No known medicines were matched from the text. Try searching manually.</p>
             {% endif %}
