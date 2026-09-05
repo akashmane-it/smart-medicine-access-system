@@ -12,13 +12,31 @@
     </div>
 
     <div class="container">
-        <h1>Welcome, {{ user_name }} 👋</h1>
-        <p>Search for medicines or scan a prescription to get started.</p>
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+            <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                <circle cx="35" cy="35" r="33" fill="#eff6ff"/>
+                <circle cx="35" cy="27" r="11" fill="#60a5fa"/>
+                <path d="M15 58 C15 43 24 38 35 38 C46 38 55 43 55 58 Z" fill="#2563eb"/>
+            </svg>
+            <div>
+                <h1 style="margin-bottom:4px;">Welcome, {{ user_name }} 👋</h1>
+                <p style="margin-bottom:0;">Search for medicines or scan a prescription to get started.</p>
+            </div>
+        </div>
 
-        <div class="action-links">
-            <a href="/search" class="link-blue">🔍 Search for Medicines</a>
-            <a href="/upload-prescription" class="link-purple">📄 Upload Prescription</a>
-            <a href="/my-reservations" class="link-blue">🛒 My Reservations</a>
+        <div class="action-cards">
+            <a href="/search" class="action-card card-blue">
+                <span class="action-icon">🔍</span>
+                <span>Search for Medicines</span>
+            </a>
+            <a href="/upload-prescription" class="action-card card-purple">
+                <span class="action-icon">📄</span>
+                <span>Upload Prescription</span>
+            </a>
+            <a href="/my-reservations" class="action-card card-teal">
+                <span class="action-icon">🛒</span>
+                <span>My Reservations</span>
+            </a>
         </div>
     </div>
 </body>

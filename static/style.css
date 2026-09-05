@@ -344,3 +344,57 @@ a, button, .role-card, .feature-card {
 tbody tr:hover {
     box-shadow: 0 1px 8px rgba(15, 23, 42, 0.05);
 }
+
+/* STYLISH ACTION CARDS (replaces plain pill-style action links) */
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.98em;
+    box-shadow: 0 2px 10px rgba(15,23,42,0.06);
+    border: 1.5px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+}
+
+.action-card .action-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em;
+    flex-shrink: 0;
+}
+
+.action-card.card-blue { background: #eff6ff; color: #1d4ed8; }
+.action-card.card-blue .action-icon { background: #dbeafe; }
+.action-card.card-blue:hover { border-color: #93c5fd; }
+
+.action-card.card-purple { background: #f5f3ff; color: #6d28d9; }
+.action-card.card-purple .action-icon { background: #ede9fe; }
+.action-card.card-purple:hover { border-color: #c4b5fd; }
+
+.action-card.card-teal { background: #f0fdfa; color: #0f766e; }
+.action-card.card-teal .action-icon { background: #ccfbf1; }
+.action-card.card-teal:hover { border-color: #5eead4; }
+
+.action-card.card-orange { background: #fff7ed; color: #c2410c; }
+.action-card.card-orange .action-icon { background: #ffedd5; }
+.action-card.card-orange:hover { border-color: #fdba74; }

@@ -11,13 +11,20 @@
         <div><a href="/">Home</a></div>
     </div>
 
-    <div class="container" style="max-width: 560px;">
-        <h1>Pharmacy Registration</h1>
+    <div class="container" style="max-width: 560px; text-align: center;">
+        <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 10px;">
+            <circle cx="45" cy="45" r="42" fill="#f0fdfa"/>
+            <rect x="25" y="35" width="40" height="35" rx="4" fill="#0d9488"/>
+            <rect x="38" y="45" width="14" height="14" fill="#ffffff"/>
+            <path d="M20 38 L45 18 L70 38 Z" fill="#0f766e"/>
+        </svg>
+        <h1 style="text-align:left;">Pharmacy Registration</h1>
 
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
 
+        <div style="text-align: left;">
         <form method="POST" action="/pharmacy/register" id="regForm">
             <label>Pharmacy Name</label>
             <input type="text" name="name" required>
@@ -45,7 +52,8 @@
 
             <br>
             <button type="submit">Register Pharmacy</button>
-        </form>
+                </form>
+        </div>
 
         <p style="margin-top:18px;">Already registered? <a href="/pharmacy/login">Login here</a></p>
     </div>

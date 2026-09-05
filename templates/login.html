@@ -11,13 +11,19 @@
         <div><a href="/">Home</a></div>
     </div>
 
-    <div class="container" style="max-width: 480px;">
-        <h1>User Login</h1>
+    <div class="container" style="max-width: 480px; text-align: center;">
+        <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 10px;">
+            <circle cx="45" cy="45" r="42" fill="#eff6ff"/>
+            <circle cx="45" cy="35" r="14" fill="#60a5fa"/>
+            <path d="M20 72 C20 55 30 48 45 48 C60 48 70 55 70 72 Z" fill="#2563eb"/>
+        </svg>
+        <h1 style="text-align:left;">User Login</h1>
 
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
 
+        <div style="text-align: left;">
         <form method="POST" action="/login">
             <label>Email</label>
             <input type="email" name="email" required>
@@ -26,7 +32,8 @@
             <input type="password" name="password" required>
 
             <button type="submit">Login</button>
-        </form>
+                </form>
+        </div>
 
         <p style="margin-top:18px;">Don't have an account? <a href="/register">Register here</a></p>
     </div>

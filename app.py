@@ -384,7 +384,7 @@ def request_medicine():
     conn.commit()
     conn.close()
 
-    return f"Your request for '{medicine_name}' has been submitted. <br><a href='/search'>Back to Search</a>"
+    return render_template('request_success.html', medicine_name=medicine_name)
 @app.route('/pharmacy/requests')
 def pharmacy_requests():
     if 'pharmacy_id' not in session:

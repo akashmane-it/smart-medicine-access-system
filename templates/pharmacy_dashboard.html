@@ -11,14 +11,32 @@
         <div><a href="/pharmacy/logout">Logout</a></div>
     </div>
 
-    <div class="container">
-        <h1>Welcome, {{ pharmacy_name }} 🏥</h1>
-        <p>Manage your medicine stock and view incoming requests.</p>
+    <div class="container" style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+        <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+            <circle cx="35" cy="35" r="33" fill="#f0fdfa"/>
+            <rect x="20" y="28" width="30" height="26" rx="3" fill="#0d9488"/>
+            <rect x="30" y="35" width="10" height="10" fill="#ffffff"/>
+            <path d="M17 30 L35 15 L53 30 Z" fill="#0f766e"/>
+        </svg>
+        <div>
+        <h1 style="margin-bottom:4px;">Welcome, {{ pharmacy_name }} 🏥</h1>
+        <p style="margin-bottom:0;">Manage your medicine stock and view incoming requests.</p>
+        </div>
+        </div>
 
-        <div class="action-links">
-            <a href="/pharmacy/add-medicine" class="link-teal">➕ Add / Update Medicine Stock</a>
-            <a href="/pharmacy/requests" class="link-teal">📋 View Medicine Requests</a>
-            <a href="/pharmacy/reservations" class="link-teal">🛒 Incoming Reservations</a>
+        <div class="action-cards">
+            <a href="/pharmacy/add-medicine" class="action-card card-teal">
+                <span class="action-icon">➕</span>
+                <span>Add / Update Medicine Stock</span>
+            </a>
+            <a href="/pharmacy/requests" class="action-card card-orange">
+                <span class="action-icon">📋</span>
+                <span>View Medicine Requests</span>
+            </a>
+            <a href="/pharmacy/reservations" class="action-card card-blue">
+                <span class="action-icon">🛒</span>
+                <span>Incoming Reservations</span>
+            </a>
         </div>
 
         <h2>Your Medicine Stock</h2>

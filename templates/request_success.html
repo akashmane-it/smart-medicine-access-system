@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Submitted</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <span class="brand">💊 MedFinder</span>
+        <div><a href="/dashboard">← Dashboard</a></div>
+    </div>
+
+    <div class="container" style="max-width: 520px; text-align: center;">
+        <div style="font-size: 3em; margin-bottom: 10px;">🔔</div>
+        <h1>Request Submitted!</h1>
+        <p class="success-box">
+            We've recorded your request for <strong>{{ medicine_name }}</strong>. You'll be notified when a nearby pharmacy has it in stock.
+        </p>
+
+        <div class="action-cards">
+            <a href="/search" class="action-card card-blue">
+                <span class="action-icon">🔍</span>
+                <span>Search More Medicines</span>
+            </a>
+            <a href="/dashboard" class="action-card card-purple">
+                <span class="action-icon">🏠</span>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
